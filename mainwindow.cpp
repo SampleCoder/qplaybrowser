@@ -116,7 +116,22 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
 
     auto fullpath = currentPath;
     if (!fullpath.endsWith("/")) fullpath.append("/");
-    fullpath += item->text().split("\t")[0];
+    auto filename = item->text().split("\t")[0];
+
+    if (filename == "..") {
+        auto stdFullPath = fullpath.toStdString();
+        auto p1 = stdFullPath.size() - 1;
+        while (p1 > 0) {
+            if (stdFullPath[p1] == '/') p1 --; else break;
+        }
+        while (p1 > 0) {
+            if (stdFullPath[p1] != '/') p1 --; else break;
+        }
+        fullpath = QString::fromStdString(stdFullPath.substr(0, p1 + 1));
+
+    } else if (filename != ".") {
+        fullpath += filename;
+    }
 
     if (item->text().contains("[FILE]")) {
         // TODO: Search "open using executable" method.
