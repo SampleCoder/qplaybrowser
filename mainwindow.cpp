@@ -114,17 +114,17 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
 
-    auto fullpath = currentPath + "/" + item->text().split("\t")[0];
+    auto fullpath = currentPath;
+    if (!fullpath.endsWith("/")) fullpath.append("/");
+    fullpath += item->text().split("\t")[0];
+
     if (item->text().contains("[FILE]")) {
         // TODO: Search "open using executable" method.
-        auto filename = item->text().split("\t")[0];
-        // execl("/bin/xdg-open", "/bin/xdg-open", (currentPath + "/" + filename).toStdString().c_str());
         QProcess p;
-        p.start("/bin/xdg-open", { currentPath + "/" + filename });
+        p.start("/bin/xdg-open", { fullpath });
         p.waitForFinished(0xFF000E3);
     }
     else if (item->text().contains("[DIR]")) {
-        // TODO : Rework change directory model.
         ui->plainTextEdit->setPlainText(fullpath);
         on_pushButton_3_clicked();
     }
