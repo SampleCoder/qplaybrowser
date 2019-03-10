@@ -46,6 +46,8 @@ void MainWindow::on_pushButton_clicked() {
 QStringList MainWindow::getDirectoryNames(const QString & dirName) {
     QStringList result;
     DIR *dirp;
+    __off_t totalAmount = 0;
+    unsigned int filesCount = 0;
     dirp = opendir(dirName.toStdString().c_str());
     if (dirp) {
         dirent *pDirEnt;
@@ -54,7 +56,9 @@ QStringList MainWindow::getDirectoryNames(const QString & dirName) {
             if (!pDirEnt) break;
             QString entry { pDirEnt->d_name };
 
-            entry += "\t\t";
+            entry += "\t";
+            if (entry.size() < 16)
+                entry += "\t";
             if (pDirEnt->d_type == DT_DIR)
                 entry += "[DIR]";
 
@@ -66,9 +70,12 @@ QStringList MainWindow::getDirectoryNames(const QString & dirName) {
                 int fd = open(fullpath.toStdString().c_str(), O_RDONLY);
                 if (fd != -1) {
                     struct stat fileStat;
+
+                    filesCount += 1;
                     if (fstat(fd, &fileStat) == 0) {
                         entry += " " + (fileStat.st_size > 1024 ? QString::number(fileStat.st_size / 1024) + " KiB" :
                                                                   QString::number(fileStat.st_size) + " byte(s)");
+                        totalAmount += fileStat.st_size;
                     }
                 }
             }
@@ -78,13 +85,17 @@ QStringList MainWindow::getDirectoryNames(const QString & dirName) {
             result.append(entry);
         }
         closedir(dirp);
+        ui->label_Total->setText(QString("Total ") +
+                                 QString::number(totalAmount > 1024 ? totalAmount / 1024 : totalAmount)
+                                 + (totalAmount > 1024 ? " KiB in " : " byte(s) in ") +
+                                 QString::number(filesCount) + " file(s)");
     }
     return result;
 }
 
 void MainWindow::on_pushButton_3_clicked() {
     // auto path = QInputDialog::getText(this, "Which dir?", "Input target directory name");
-    auto path = ui->plainTextEdit->toPlainText();
+    auto path = ui->lineEdit->text();
     if (path.length() == 0) return;
     auto dirNames = getDirectoryNames(path);
     if (dirNames.empty()) {
@@ -98,8 +109,15 @@ void MainWindow::on_pushButton_3_clicked() {
         ui->label->setText("Showing directory \"" + path + "\".");
         dirNames.sort();
         ui->listWidget->addItems(dirNames);
-        ui->listWidget->item(0)->setTextColor(Qt::green);
-        ui->listWidget->repaint();
+
+        for (int i = 0; i < ui->listWidget->count(); ++ i) {
+            if (ui->listWidget->item(i)->text().contains("[DIR]")) {
+                ui->listWidget->item(i)->setTextColor(Qt::blue);
+            }
+            if (ui->listWidget->item(i)->text().contains("[LINK]")) {
+                ui->listWidget->item(i)->setTextColor(Qt::cyan);
+            }
+        }
 
         currentPath = path;
     }
@@ -140,7 +158,12 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
         p.waitForFinished(0xFF000E3);
     }
     else if (item->text().contains("[DIR]")) {
-        ui->plainTextEdit->setPlainText(fullpath);
+        ui->lineEdit->setText(fullpath);
         on_pushButton_3_clicked();
     }
+}
+
+void MainWindow::on_lineEdit_returnPressed()
+{
+    on_pushButton_3_clicked();
 }

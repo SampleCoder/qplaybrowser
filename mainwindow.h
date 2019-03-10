@@ -45,6 +45,8 @@ private slots:
 
   void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
+  void on_lineEdit_returnPressed();
+
 private:
   QStringList getDirectoryNames(const QString & dirName);
   QString currentPath;

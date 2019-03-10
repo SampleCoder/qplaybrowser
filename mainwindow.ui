@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
-    <height>352</height>
+    <width>542</width>
+    <height>402</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,12 +18,9 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>28</height>
-         </size>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="placeholderText">
+         <string>Enter path</string>
         </property>
        </widget>
       </item>
@@ -36,6 +33,13 @@
       </item>
       <item>
        <widget class="QListWidget" name="listWidget"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_Total">
+        <property name="text">
+         <string>Total Amount</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton">
@@ -67,7 +71,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>478</width>
+     <width>542</width>
      <height>21</height>
     </rect>
    </property>
