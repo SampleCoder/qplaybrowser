@@ -93,9 +93,12 @@ QStringList MainWindow::getDirectoryNames(const QString & dirName) {
     return result;
 }
 
+#include <QDebug>
 void MainWindow::on_pushButton_3_clicked() {
-    // auto path = QInputDialog::getText(this, "Which dir?", "Input target directory name");
     auto path = ui->lineEdit->text();
+    if (!path.startsWith("/")) {
+        path = currentPath + "/" + path;
+    }
     if (path.length() == 0) return;
     auto dirNames = getDirectoryNames(path);
     if (dirNames.empty()) {
@@ -156,8 +159,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
         QProcess p;
         p.start("/bin/xdg-open", { fullpath });
         p.waitForFinished(0xFF000E3);
-    }
-    else if (item->text().contains("[DIR]")) {
+    } else if (item->text().contains("[DIR]")) {
         ui->lineEdit->setText(fullpath);
         on_pushButton_3_clicked();
     }
