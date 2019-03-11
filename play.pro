@@ -27,11 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    randomgen.cpp
+    randomgen.cpp \
+    fsinfo.cpp
 
 HEADERS += \
         mainwindow.h \
-    randomgen.h
+    randomgen.h \
+    fsinfo.h
 
 FORMS += \
         mainwindow.ui

@@ -41,8 +41,6 @@ private slots:
 
   void on_label_setText();
 
-  void on_listWidget_itemClicked(QListWidgetItem *item);
-
   void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
   void on_lineEdit_returnPressed();

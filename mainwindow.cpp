@@ -2,10 +2,7 @@
 #include "ui_mainwindow.h"
 
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include "fsinfo.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -45,55 +42,19 @@ void MainWindow::on_pushButton_clicked() {
 
 QStringList MainWindow::getDirectoryNames(const QString & dirName) {
     QStringList result;
-    DIR *dirp;
-    __off_t totalAmount = 0;
-    unsigned int filesCount = 0;
-    dirp = opendir(dirName.toStdString().c_str());
-    if (dirp) {
-        dirent *pDirEnt;
-        while (true) {
-            pDirEnt = readdir(dirp);
-            if (!pDirEnt) break;
-            QString entry { pDirEnt->d_name };
-
-            entry += "\t";
-            if (entry.size() < 16)
-                entry += "\t";
-            if (pDirEnt->d_type == DT_DIR)
-                entry += "[DIR]";
-
-            if (pDirEnt->d_type == DT_REG) {
-                entry += "[FILE]";
-
-                QString fullpath(dirName);
-                fullpath.append("/") += pDirEnt->d_name;
-                int fd = open(fullpath.toStdString().c_str(), O_RDONLY);
-                if (fd != -1) {
-                    struct stat fileStat;
-
-                    filesCount += 1;
-                    if (fstat(fd, &fileStat) == 0) {
-                        entry += " " + (fileStat.st_size > 1024 ? QString::number(fileStat.st_size / 1024) + " KiB" :
-                                                                  QString::number(fileStat.st_size) + " byte(s)");
-                        totalAmount += fileStat.st_size;
-                    }
-                }
-            }
-
-            if (pDirEnt->d_type == DT_LNK)
-                entry += "[LINK]";
-            result.append(entry);
-        }
-        closedir(dirp);
-        ui->label_Total->setText(QString("Total ") +
-                                 QString::number(totalAmount > 1024 ? totalAmount / 1024 : totalAmount)
-                                 + (totalAmount > 1024 ? " KiB in " : " byte(s) in ") +
-                                 QString::number(filesCount) + " file(s)");
+    FsInfo fsInfo(dirName);
+    if (fsInfo.open()) {
+        result = fsInfo.getTextInfo();
+        ui->label_Total->setText(
+            QString("Total ") +
+                    (fsInfo.getFilesSize() > 1024 ? QString::number(fsInfo.getFilesSize() / 1024) + " KiB in " :
+                    QString::number(fsInfo.getFilesSize()) + " bytes in ") +
+                    QString::number(fsInfo.getFilesCount()) + " file(s)."
+        );
     }
     return result;
 }
 
-#include <QDebug>
 void MainWindow::on_pushButton_3_clicked() {
     auto path = ui->lineEdit->text();
     if (!path.startsWith("/")) {
@@ -127,11 +88,6 @@ void MainWindow::on_pushButton_3_clicked() {
 
 }
 
-void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
-{
-
-}
-
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
 
@@ -140,15 +96,14 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
     auto filename = item->text().split("\t")[0];
 
     if (filename == "..") {
-        auto stdFullPath = fullpath.toStdString();
-        auto p1 = stdFullPath.size() - 1;
+        auto p1 = fullpath.size() - 1;
         while (p1 > 0) {
-            if (stdFullPath[p1] == '/') p1 --; else break;
+            if (fullpath[p1] == '/') p1 --; else break;
         }
         while (p1 > 0) {
-            if (stdFullPath[p1] != '/') p1 --; else break;
+            if (fullpath[p1] != '/') p1 --; else break;
         }
-        fullpath = QString::fromStdString(stdFullPath.substr(0, p1 + 1));
+        fullpath = fullpath.left(p1 + 1);
 
     } else if (filename != ".") {
         fullpath += filename;
