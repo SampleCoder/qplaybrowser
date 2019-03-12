@@ -101,7 +101,7 @@ QString FsInfo::processDirent(const struct dirent *dirEntry) {
         } else {
             entry += " Stat failed: (";
             entry += strerror(errno);
-            entry += " " + FsInfo::combinePath({ dirPath, dirEntry->d_name }) + ")";
+            entry += " \"" + FsInfo::combinePath({ dirPath, dirEntry->d_name }) + "\")";
         }
 
     }
