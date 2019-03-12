@@ -11,10 +11,8 @@
 #include <QListWidget>
 #include <QProcess>
 #include <QPlainTextEdit>
-
-
-#include <string.h>
-#include <dirent.h>
+#include <QDesktopServices>
+#include <QUrl>
 
 
 namespace Ui {

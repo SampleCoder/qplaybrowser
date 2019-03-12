@@ -25,6 +25,10 @@ public:
     const QString & getErrorString();
     const QStringList & getTextInfo();
 
+    QString translateUnits(long bytes);
+
+    static QString combinePath(const QStringList & components);
+
 signals:
 
 public slots:

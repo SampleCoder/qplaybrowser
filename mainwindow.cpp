@@ -47,9 +47,8 @@ QStringList MainWindow::getDirectoryNames(const QString & dirName) {
         result = fsInfo.getTextInfo();
         ui->label_Total->setText(
             QString("Total ") +
-                    (fsInfo.getFilesSize() > 1024 ? QString::number(fsInfo.getFilesSize() / 1024) + " KiB in " :
-                    QString::number(fsInfo.getFilesSize()) + " bytes in ") +
-                    QString::number(fsInfo.getFilesCount()) + " file(s)."
+                    fsInfo.translateUnits(fsInfo.getFilesSize()) +
+                    " in " + QString::number(fsInfo.getFilesCount()) + " file(s)."
         );
     }
     return result;
@@ -110,10 +109,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item) {
     }
 
     if (item->text().contains("[FILE]")) {
-        // TODO: Search "open using executable" method.
-        QProcess p;
-        p.start("/bin/xdg-open", { fullpath });
-        p.waitForFinished(0xFF000E3);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fullpath));
     } else if (item->text().contains("[DIR]")) {
         ui->lineEdit->setText(fullpath);
         on_pushButton_3_clicked();
