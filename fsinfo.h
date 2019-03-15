@@ -21,7 +21,7 @@ public:
     bool open();
     int getErrorCode();
     int getFilesCount();
-    int getFilesSize();
+    long getFilesSize();
     const QString & getErrorString();
     const QStringList & getTextInfo();
 
@@ -39,7 +39,7 @@ private:
     QStringList textInfo;
     int errNo;
     int filesCount;
-    int filesSize;
+    long filesSize;
     QString errorString;
     QString dirPath;
     DIR * pDir;

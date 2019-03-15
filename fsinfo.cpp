@@ -131,7 +131,7 @@ FsInfo::~FsInfo() {
     }
 }
 
-int FsInfo::getFilesSize() {
+long FsInfo::getFilesSize() {
     return filesSize;
 }
 
